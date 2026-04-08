@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app-deployment
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      containers:
+        # Main app container --
+        - name: node-app
+          image: k8s-img
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: app-storage
+              mountPath: /app/data
+            - name: log-storage       # shared log volume
+              mountPath: /app/logs
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config
+                  key: APP_ENV
+            - name: APP_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: node-app-config
+                  key: APP_MESSAGE
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: node-app-secret
+                  key: DB_PASSWORD
+
+        # ── Sidecar container ───────────────────────────
+        - name: log-sidecar
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Log sidecar started, waiting for logs...";
+              while [ ! -f /app/logs/app.log ]; do sleep 1; done;
+              tail -f /app/logs/app.log
+          volumeMounts:
+            - name: log-storage       # ← same shared volume
+              mountPath: /app/logs
+
+      volumes:
+        - name: app-storage
+          persistentVolumeClaim:
+            claimName: node-app-pvc
+        - name: log-storage           # ← emptyDir = temporary shared storage
+          emptyDir: {}

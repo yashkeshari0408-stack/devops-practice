@@ -1,0 +1,6 @@
+apiVersion: v2
+name: node-app-chart
+description: Yash's Node.js Kubernetes app
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

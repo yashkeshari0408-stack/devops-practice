@@ -1,0 +1,25 @@
+# Binaries
+kubectl
+minikube
+minikube-linux-amd64
+*.exe
+*.bin
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
+
+# Sensitive k8s (optional but good habit)
+# k8s/secret.yaml

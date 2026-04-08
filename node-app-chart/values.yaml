@@ -1,0 +1,26 @@
+replicaCount: 2
+
+image:
+  repository: k8s-img
+  tag: latest
+  pullPolicy: Never
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+config:
+  appEnv: "production"
+  appMessage: "Hello from Helm!"
+
+secret:
+  dbPassword: "bXlTdXBlclNlY3JldFBhc3N3b3Jk"
+
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "100m"
+  limits:
+    memory: "128Mi"
+    cpu: "200m"
