@@ -76,6 +76,13 @@ spec:
               echo "Log sidecar started, waiting for logs...";
               while [ ! -f /app/logs/app.log ]; do sleep 1; done;
               tail -f /app/logs/app.log
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"    
           volumeMounts:
             - name: log-storage       # ← same shared volume
               mountPath: /app/logs
