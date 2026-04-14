@@ -4,4 +4,4 @@ metadata:
   name: node-app-config
 data:
   APP_ENV: "production"
-  APP_MESSAGE: "Hello from Kubernetes ConfigMap!"
+  APP_MESSAGE: "Deployed automatically by ArgoCD!"
